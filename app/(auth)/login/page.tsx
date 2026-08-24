@@ -13,10 +13,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 
 export default function LoginPage() {
+  const t = useTranslations("Login")
+  const tv = useTranslations("Validation")
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -43,9 +46,9 @@ export default function LoginPage() {
     if (authError) {
       if (authError.status === 403) {
         setEmailNotVerified(true)
-        setError("Sua conta não está ativada. Verifique seu e-mail.")
+        setError(t("accountNotVerified"))
       } else {
-        setError(authError.message ?? "E-mail ou senha inválidos")
+        setError(authError.message ?? t("invalidCredentials"))
       }
     } else {
       router.replace("/protected")
@@ -73,24 +76,24 @@ export default function LoginPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Entrar</CardTitle>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
         <CardDescription>
-          Insira suas credenciais para acessar sua conta
+          {t("description")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">E-mail *</Label>
+            <Label htmlFor="email">{t("emailLabel")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="seu@email.com"
+              placeholder={t("emailPlaceholder")}
               {...register("email", {
-                required: "E-mail é obrigatório",
+                required: tv("emailRequired"),
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: "E-mail inválido",
+                  message: tv("emailInvalid"),
                 },
               })}
             />
@@ -100,20 +103,20 @@ export default function LoginPage() {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Senha *</Label>
+              <Label htmlFor="password">{t("passwordLabel")}</Label>
               <a
                 href="/forgot-password"
                 className="text-sm text-muted-foreground underline-offset-4 hover:underline"
               >
-                Esqueceu a senha?
+                {t("forgotPassword")}
               </a>
             </div>
             <Input
               id="password"
               type="password"
-              placeholder="Digite sua senha"
+              placeholder={t("passwordPlaceholder")}
               {...register("password", {
-                required: "Senha é obrigatória",
+                required: tv("passwordRequired"),
               })}
             />
             {errors.password && (
@@ -128,9 +131,9 @@ export default function LoginPage() {
           {emailNotVerified && (
             <div className="text-center space-y-2">
               {resendState === "sent" ? (
-                <p className="text-sm text-green-600">E-mail reenviado com sucesso!</p>
+                <p className="text-sm text-green-600">{t("resentSuccess")}</p>
               ) : resendState === "error" ? (
-                <p className="text-sm text-destructive">Erro ao reenviar. Tente novamente.</p>
+                <p className="text-sm text-destructive">{t("resentError")}</p>
               ) : (
                 <Button
                   type="button"
@@ -140,13 +143,13 @@ export default function LoginPage() {
                   disabled={resendState === "sending"}
                   onClick={handleResendVerification}
                 >
-                  {resendState === "sending" ? "Enviando..." : "Reenviar e-mail de confirmação"}
+                  {resendState === "sending" ? t("sending") : t("resendVerification")}
                 </Button>
               )}
             </div>
           )}
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Entrando..." : "Entrar"}
+            {isPending ? t("submitting") : t("submit")}
           </Button>
         </form>
         <div className="relative my-6">
@@ -155,7 +158,7 @@ export default function LoginPage() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-card px-2 text-muted-foreground">
-              Ou continue com
+              {t("orContinueWith")}
             </span>
           </div>
         </div>
@@ -177,12 +180,12 @@ export default function LoginPage() {
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Não tem uma conta?{" "}
+          {t("noAccount")}{" "}
           <a
             href="/register"
             className="text-foreground underline-offset-4 hover:underline"
           >
-            Cadastre-se
+            {t("signUpLink")}
           </a>
         </p>
       </CardFooter>

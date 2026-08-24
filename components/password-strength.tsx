@@ -1,5 +1,7 @@
 "use client"
 
+import { useTranslations } from "next-intl"
+
 interface PasswordRequirement {
   label: string
   met: boolean
@@ -10,12 +12,14 @@ interface PasswordStrengthProps {
 }
 
 export function PasswordStrength({ value }: PasswordStrengthProps) {
+  const t = useTranslations("PasswordStrength")
+
   const requirements: PasswordRequirement[] = [
-    { label: "Pelo menos 8 caracteres", met: value.length >= 8 },
-    { label: "Letra minúscula", met: /[a-z]/.test(value) },
-    { label: "Letra maiúscula", met: /[A-Z]/.test(value) },
-    { label: "Número", met: /\d/.test(value) },
-    { label: "Símbolo", met: /[^a-zA-Z0-9]/.test(value) },
+    { label: t("minLength"), met: value.length >= 8 },
+    { label: t("lowercase"), met: /[a-z]/.test(value) },
+    { label: t("uppercase"), met: /[A-Z]/.test(value) },
+    { label: t("number"), met: /\d/.test(value) },
+    { label: t("symbol"), met: /[^a-zA-Z0-9]/.test(value) },
   ]
 
   const strength = requirements.filter((r) => r.met).length

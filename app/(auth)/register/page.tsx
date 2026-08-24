@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PasswordStrength } from "@/components/password-strength"
+import { useTranslations } from "next-intl"
 import {
   Card,
   CardHeader,
@@ -18,6 +19,9 @@ import {
 } from "@/components/ui/card"
 
 export default function RegisterPage() {
+  const t = useTranslations("Register")
+  const tv = useTranslations("Validation")
+  const ta = useTranslations("Auth")
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
@@ -57,10 +61,9 @@ export default function RegisterPage() {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Verifique seu e-mail</CardTitle>
+          <CardTitle className="text-xl">{t("verifyEmailTitle")}</CardTitle>
           <CardDescription>
-            Enviamos um link de verificação para seu e-mail. Clique no link
-            para ativar sua conta.
+            {t("verifyEmailDescription")}
           </CardDescription>
         </CardHeader>
         <CardFooter className="justify-center">
@@ -68,7 +71,7 @@ export default function RegisterPage() {
             href="/login"
             className="text-sm text-foreground underline-offset-4 hover:underline"
           >
-            Voltar para o login
+            {ta("backToLogin")}
           </a>
         </CardFooter>
       </Card>
@@ -78,27 +81,27 @@ export default function RegisterPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Criar conta</CardTitle>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
         <CardDescription>
-          Preencha seus dados para criar uma conta
+          {t("description")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nome e Sobrenome*</Label>
+            <Label htmlFor="name">{t("nameLabel")}</Label>
             <Input
               id="name"
-              placeholder="Seu nome"
+              placeholder={t("namePlaceholder")}
               {...register("name", {
-                required: "Nome é obrigatório",
+                required: tv("nameRequired"),
                 minLength: {
                   value: 2,
-                  message: "Nome deve ter pelo menos 2 caracteres",
+                  message: tv("nameMinLength"),
                 },
                 pattern: {
                   value: /^\s*\S+(?:\s+\S+)+\s*$/,
-                  message: "Deve conter pelo menos um nome e um sobrenome"
+                  message: tv("fullNameRequired")
                 },
                 setValueAs: (v: string) => v.replace(/\b\w/g, c => c.toUpperCase())
               })}
@@ -108,16 +111,16 @@ export default function RegisterPage() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">E-mail *</Label>
+            <Label htmlFor="email">{t("emailLabel")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="seu@email.com"
+              placeholder={t("emailPlaceholder")}
               {...register("email", {
-                required: "E-mail é obrigatório",
+                required: tv("emailRequired"),
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: "E-mail inválido",
+                  message: tv("emailInvalid"),
                 },
               })}
             />
@@ -128,22 +131,22 @@ export default function RegisterPage() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Senha *</Label>
+            <Label htmlFor="password">{t("passwordLabel")}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Crie uma senha"
+              placeholder={t("passwordPlaceholder")}
               {...register("password", {
-                required: "Senha é obrigatória",
+                required: tv("passwordRequired"),
                 minLength: {
                   value: 8,
-                  message: "Senha deve ter pelo menos 8 caracteres",
+                  message: tv("passwordMinLength"),
                 },
                 validate: (val: string) => {
-                  if (!/[a-z]/.test(val)) return "Deve conter letra minúscula"
-                  if (!/[A-Z]/.test(val)) return "Deve conter letra maiúscula"
-                  if (!/\d/.test(val)) return "Deve conter um número"
-                  if (!/[^a-zA-Z0-9]/.test(val)) return "Deve conter um símbolo"
+                  if (!/[a-z]/.test(val)) return tv("lowercaseRequired")
+                  if (!/[A-Z]/.test(val)) return tv("uppercaseRequired")
+                  if (!/\d/.test(val)) return tv("numberRequired")
+                  if (!/[^a-zA-Z0-9]/.test(val)) return tv("symbolRequired")
                   return true
                 },
               })}
@@ -156,15 +159,15 @@ export default function RegisterPage() {
             <PasswordStrength value={watch("password") ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirmar senha *</Label>
+            <Label htmlFor="confirmPassword">{t("confirmPasswordLabel")}</Label>
             <Input
               id="confirmPassword"
               type="password"
-              placeholder="Confirme sua senha"
+              placeholder={t("confirmPasswordPlaceholder")}
               {...register("confirmPassword", {
-                required: "Por favor, confirme sua senha",
+                required: tv("confirmPasswordRequired"),
                 validate: (val: string) =>
-                  val === watch("password") || "Senhas não conferem",
+                  val === watch("password") || tv("passwordsMismatch"),
               })}
             />
             {errors.confirmPassword && (
@@ -177,7 +180,7 @@ export default function RegisterPage() {
             <p className="text-sm text-destructive text-center">{error}</p>
           )}
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Criando conta..." : "Criar conta"}
+            {isPending ? t("submitting") : t("submit")}
           </Button>
         </form>
         <div className="relative my-6">
@@ -186,7 +189,7 @@ export default function RegisterPage() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-card px-2 text-muted-foreground">
-              Ou continue com
+              {t("orContinueWith")}
             </span>
           </div>
         </div>
@@ -208,12 +211,12 @@ export default function RegisterPage() {
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Já tem uma conta?{" "}
+          {t("haveAccount")}{" "}
           <a
             href="/login"
             className="text-foreground underline-offset-4 hover:underline"
           >
-            Entrar
+            {t("signInLink")}
           </a>
         </p>
       </CardFooter>

@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   Geist,
   Inter,
@@ -37,40 +38,46 @@ const interTight = Inter_Tight({
   weight: "700",
 });
 
-const APP_NAME = "App";
-const APP_DESCRIPTION = "App description";
-const APP_TITLE = {
-  default: APP_NAME,
-  template: "%s - App",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata");
+  const appName = t("appName");
+  const appDescription = t("appDescription");
+  const appTitle = {
+    default: appName,
+    template: `%s - ${appName}`,
+  };
 
-export const metadata: Metadata = {
-  applicationName: APP_NAME,
-  title: APP_TITLE,
-  description: APP_DESCRIPTION,
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: APP_NAME,
-  },
-  formatDetection: {
-    telephone: false,
-  },
-  openGraph: {
-    type: "website",
-    siteName: APP_NAME,
-    title: APP_TITLE,
-    description: APP_DESCRIPTION,
-  },
-};
+  return {
+    applicationName: appName,
+    title: appTitle,
+    description: appDescription,
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: appName,
+    },
+    formatDetection: {
+      telephone: false,
+    },
+    openGraph: {
+      type: "website",
+      siteName: appName,
+      title: appTitle,
+      description: appDescription,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
     <html
+      lang={locale}
       className={cn(
         "h-full",
         inter.variable,

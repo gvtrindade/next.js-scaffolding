@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PasswordStrength } from "@/components/password-strength"
+import { useTranslations } from "next-intl"
 import {
   Card,
   CardHeader,
@@ -26,6 +27,9 @@ export default function ResetPasswordPage() {
 }
 
 function ResetPasswordForm() {
+  const t = useTranslations("ResetPassword")
+  const tv = useTranslations("Validation")
+  const ta = useTranslations("Auth")
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
@@ -40,7 +44,7 @@ function ResetPasswordForm() {
 
   const onSubmit = (data: { newPassword: string }) => {
     if (!token) {
-      setError("Token de redefinição inválido ou ausente")
+      setError(t("invalidToken"))
       return
     }
     setError(null)
@@ -61,9 +65,9 @@ function ResetPasswordForm() {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Link inválido</CardTitle>
+          <CardTitle className="text-xl">{t("invalidLinkTitle")}</CardTitle>
           <CardDescription>
-            Este link de redefinição de senha é inválido ou expirou.
+            {t("invalidLinkDescription")}
           </CardDescription>
         </CardHeader>
         <CardFooter className="justify-center">
@@ -71,7 +75,7 @@ function ResetPasswordForm() {
             href="/forgot-password"
             className="text-sm text-foreground underline-offset-4 hover:underline"
           >
-            Solicitar novo link de redefinição
+            {t("requestNewLink")}
           </a>
         </CardFooter>
       </Card>
@@ -81,28 +85,28 @@ function ResetPasswordForm() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Redefinir senha</CardTitle>
-        <CardDescription>Insira sua nova senha abaixo</CardDescription>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="newPassword">Nova senha</Label>
+            <Label htmlFor="newPassword">{t("newPasswordLabel")}</Label>
             <Input
               id="newPassword"
               type="password"
-              placeholder="Digite a nova senha"
+              placeholder={t("newPasswordPlaceholder")}
               {...register("newPassword", {
-                required: "Senha é obrigatória",
+                required: tv("passwordRequired"),
                 minLength: {
                   value: 8,
-                  message: "Senha deve ter pelo menos 8 caracteres",
+                  message: tv("passwordMinLength"),
                 },
                 validate: (val: string) => {
-                  if (!/[a-z]/.test(val)) return "Deve conter letra minúscula"
-                  if (!/[A-Z]/.test(val)) return "Deve conter letra maiúscula"
-                  if (!/\d/.test(val)) return "Deve conter um número"
-                  if (!/[^a-zA-Z0-9]/.test(val)) return "Deve conter um símbolo"
+                  if (!/[a-z]/.test(val)) return tv("lowercaseRequired")
+                  if (!/[A-Z]/.test(val)) return tv("uppercaseRequired")
+                  if (!/\d/.test(val)) return tv("numberRequired")
+                  if (!/[^a-zA-Z0-9]/.test(val)) return tv("symbolRequired")
                   return true
                 },
               })}
@@ -115,15 +119,15 @@ function ResetPasswordForm() {
             <PasswordStrength value={watch("newPassword") ?? ""} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirmar nova senha</Label>
+            <Label htmlFor="confirmPassword">{t("confirmPasswordLabel")}</Label>
             <Input
               id="confirmPassword"
               type="password"
-              placeholder="Confirme a nova senha"
+              placeholder={t("confirmPasswordPlaceholder")}
               {...register("confirmPassword", {
-                required: "Por favor, confirme sua senha",
+                required: tv("confirmPasswordRequired"),
                 validate: (val: string) =>
-                  val === watch("newPassword") || "Senhas não conferem",
+                  val === watch("newPassword") || tv("passwordsMismatch"),
               })}
             />
             {errors.confirmPassword && (
@@ -136,7 +140,7 @@ function ResetPasswordForm() {
             <p className="text-sm text-destructive text-center">{error}</p>
           )}
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Redefinindo..." : "Redefinir senha"}
+            {isPending ? t("submitting") : t("submit")}
           </Button>
         </form>
       </CardContent>
@@ -145,7 +149,7 @@ function ResetPasswordForm() {
           href="/login"
           className="text-sm text-muted-foreground underline-offset-4 hover:underline"
         >
-          Voltar para o login
+          {ta("backToLogin")}
         </a>
       </CardFooter>
     </Card>

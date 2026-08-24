@@ -6,6 +6,7 @@ import { forgotPasswordAction } from "@/actions/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useTranslations } from "next-intl"
 import {
   Card,
   CardHeader,
@@ -16,6 +17,9 @@ import {
 } from "@/components/ui/card"
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations("ForgotPassword")
+  const tv = useTranslations("Validation")
+  const ta = useTranslations("Auth")
   const [isPending, startTransition] = useTransition()
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -37,10 +41,9 @@ export default function ForgotPasswordPage() {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Verifique seu e-mail</CardTitle>
+          <CardTitle className="text-xl">{t("sentTitle")}</CardTitle>
           <CardDescription>
-            Se existir uma conta com esse e-mail, você receberá um link de
-            redefinição de senha em breve.
+            {t("sentDescription")}
           </CardDescription>
         </CardHeader>
         <CardFooter className="justify-center">
@@ -48,7 +51,7 @@ export default function ForgotPasswordPage() {
             href="/login"
             className="text-sm text-foreground underline-offset-4 hover:underline"
           >
-            Voltar para o login
+            {ta("backToLogin")}
           </a>
         </CardFooter>
       </Card>
@@ -58,24 +61,24 @@ export default function ForgotPasswordPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Esqueceu a senha</CardTitle>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
         <CardDescription>
-          Insira seu e-mail e enviaremos um link de redefinição
+          {t("description")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
+            <Label htmlFor="email">{t("emailLabel")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="seu@email.com"
+              placeholder={t("emailPlaceholder")}
               {...register("email", {
-                required: "E-mail é obrigatório",
+                required: tv("emailRequired"),
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: "E-mail inválido",
+                  message: tv("emailInvalid"),
                 },
               })}
             />
@@ -87,7 +90,7 @@ export default function ForgotPasswordPage() {
             <p className="text-sm text-destructive text-center">{error}</p>
           )}
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Enviando..." : "Enviar link de redefinição"}
+            {isPending ? t("submitting") : t("submit")}
           </Button>
         </form>
       </CardContent>
@@ -96,7 +99,7 @@ export default function ForgotPasswordPage() {
           href="/login"
           className="text-sm text-muted-foreground underline-offset-4 hover:underline"
         >
-          Voltar para o login
+          {ta("backToLogin")}
         </a>
       </CardFooter>
     </Card>

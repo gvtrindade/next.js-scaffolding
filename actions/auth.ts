@@ -3,10 +3,12 @@
 import * as Sentry from "@sentry/nextjs"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
+import { getTranslations } from "next-intl/server"
 import { redirect } from "next/navigation"
 
 export async function loginAction(data: { email: string; password: string }) {
   return Sentry.withServerActionInstrumentation("loginAction", async () => {
+    const t = await getTranslations("Errors")
     try {
       await auth.api.signInEmail({
         body: { email: data.email, password: data.password },
@@ -14,7 +16,7 @@ export async function loginAction(data: { email: string; password: string }) {
       })
     } catch (error) {
       const err = error as { body?: { message?: string } }
-      return { error: err?.body?.message ?? "Invalid email or password" }
+      return { error: err?.body?.message ?? t("invalidCredentials") }
     }
     redirect("/eventos")
   })
@@ -26,6 +28,7 @@ export async function signupAction(data: {
   password: string
 }) {
   return Sentry.withServerActionInstrumentation("signupAction", async () => {
+    const t = await getTranslations("Errors")
     try {
       await auth.api.signUpEmail({
         body: { name: data.name, email: data.email, password: data.password },
@@ -34,7 +37,7 @@ export async function signupAction(data: {
       return { success: true }
     } catch (error) {
       const err = error as { body?: { message?: string } }
-      return { error: err?.body?.message ?? "Failed to create account" }
+      return { error: err?.body?.message ?? t("signUpFailed") }
     }
   })
 }
@@ -56,6 +59,7 @@ export async function resetPasswordAction(data: {
   newPassword: string
 }) {
   return Sentry.withServerActionInstrumentation("resetPasswordAction", async () => {
+    const t = await getTranslations("Errors")
     try {
       await auth.api.resetPassword({
         body: { newPassword: data.newPassword, token: data.token },
@@ -63,7 +67,7 @@ export async function resetPasswordAction(data: {
       return { success: true }
     } catch (error) {
       const err = error as { body?: { message?: string } }
-      return { error: err?.body?.message ?? "Invalid or expired reset token" }
+      return { error: err?.body?.message ?? t("invalidResetToken") }
     }
   })
 }

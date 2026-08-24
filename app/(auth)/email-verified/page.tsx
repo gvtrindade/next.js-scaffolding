@@ -1,21 +1,27 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { getTranslations } from "next-intl/server"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-export const metadata: Metadata = {
-  title: "E-mail Verificado",
-  description: "Seu e-mail foi verificado com sucesso",
-  openGraph: { title: "E-mail Verificado", description: "Seu e-mail foi verificado com sucesso" },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("EmailVerified")
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    openGraph: { title: t("metaTitle"), description: t("metaDescription") },
+  }
 }
 
-export default function EmailVerifiedPage() {
+export default async function EmailVerifiedPage() {
+  const t = await getTranslations("EmailVerified")
+
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">E-mail verificado</CardTitle>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
         <CardDescription>
-          Seu e-mail foi verificado com sucesso. Sua conta está ativa.
+          {t("description")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -29,7 +35,7 @@ export default function EmailVerifiedPage() {
       </CardContent>
       <CardFooter className="justify-center">
         <Link href="/protected">
-          <Button>Go to protected page</Button>
+          <Button>{t("goToProtected")}</Button>
         </Link>
       </CardFooter>
     </Card>
