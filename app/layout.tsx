@@ -3,13 +3,7 @@ import { SerwistProvider } from "@serwist/turbopack/react";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
-import {
-  Geist,
-  Inter,
-  Inter_Tight,
-  JetBrains_Mono,
-  Roboto_Mono,
-} from "next/font/google";
+import { Geist, Inter, Inter_Tight, JetBrains_Mono, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });

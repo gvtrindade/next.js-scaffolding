@@ -1,107 +1,81 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { useTransition, useState } from "react"
-import { forgotPasswordAction } from "@/actions/auth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useTranslations } from "next-intl"
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card"
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { forgotPasswordAction } from "@/actions/auth";
+import { AuthFooterLink } from "../components/auth-footer-link";
+import { PageHeader } from "@/components/page-header";
+import { TextInput } from "@/components/text-input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { validateEmail } from "@/lib/validation";
+
+interface ForgotPasswordForm {
+  email: string;
+}
 
 export default function ForgotPasswordPage() {
-  const t = useTranslations("ForgotPassword")
-  const tv = useTranslations("Validation")
-  const ta = useTranslations("Auth")
-  const [isPending, startTransition] = useTransition()
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const t = useTranslations("ForgotPassword");
+  const tv = useTranslations("Validation");
+  const ta = useTranslations("Auth");
+  const [isPending, startTransition] = useTransition();
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ email: string }>()
+  } = useForm<ForgotPasswordForm>();
 
-  const onSubmit = (data: { email: string }) => {
-    setError(null)
+  const onSubmit = (data: ForgotPasswordForm) => {
+    setError(null);
     startTransition(async () => {
-      await forgotPasswordAction(data)
-      setSent(true)
-    })
-  }
+      const result = await forgotPasswordAction(data);
+
+      if ("error" in result) {
+        setError(result.error);
+        return;
+      }
+
+      setSent(true);
+    });
+  };
 
   if (sent) {
     return (
       <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">{t("sentTitle")}</CardTitle>
-          <CardDescription>
-            {t("sentDescription")}
-          </CardDescription>
-        </CardHeader>
-        <CardFooter className="justify-center">
-          <a
-            href="/login"
-            className="text-sm text-foreground underline-offset-4 hover:underline"
-          >
-            {ta("backToLogin")}
-          </a>
-        </CardFooter>
+        <PageHeader title={t("sentTitle")} description={t("sentDescription")} />
+        <AuthFooterLink linkLabel={ta("backToLogin")} href="/login" />
       </Card>
-    )
+    );
   }
 
   return (
     <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">{t("title")}</CardTitle>
-        <CardDescription>
-          {t("description")}
-        </CardDescription>
-      </CardHeader>
+      <PageHeader title={t("title")} description={t("description")} />
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("emailLabel")}</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder={t("emailPlaceholder")}
-              {...register("email", {
-                required: tv("emailRequired"),
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: tv("emailInvalid"),
-                },
-              })}
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
-          {error && (
-            <p className="text-sm text-destructive text-center">{error}</p>
-          )}
+          <TextInput
+            id="email"
+            type="email"
+            label={t("emailLabel")}
+            placeholder={t("emailPlaceholder")}
+            error={errors.email?.message}
+            {...register("email", {
+              validate: (value) => {
+                const validationKey = validateEmail(value);
+                return validationKey ? tv(validationKey) : true;
+              },
+            })}
+          />
+          {error ? <p className="text-sm text-destructive text-center">{error}</p> : null}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? t("submitting") : t("submit")}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center">
-        <a
-          href="/login"
-          className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-        >
-          {ta("backToLogin")}
-        </a>
-      </CardFooter>
+      <AuthFooterLink linkLabel={ta("backToLogin")} href="/login" />
     </Card>
-  )
+  );
 }

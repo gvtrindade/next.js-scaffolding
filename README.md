@@ -17,6 +17,7 @@ The auth routes are implemented and fully functional, though external configurat
 ## Running the project
 
 To run the project, execute:
+
 ```
 pnpm dev
 ```
@@ -24,10 +25,13 @@ pnpm dev
 <br />
 
 Any changes to the prisma schema, need to be generated:
+
 ```
 pnpm dlx prisma generate
 ```
+
 And migrated to the local db:
+
 ```
 pnpm dlx prisma migrate dev
 ```

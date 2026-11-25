@@ -7,7 +7,9 @@
     "appDescription": "App description"
   },
   "Auth": {
-    "backToLogin": "Back to sign in"
+    "backToLogin": "Back to sign in",
+    "orContinueWith": "Or continue with",
+    "google": "Google"
   },
   "Login": {
     "title": "Sign in",
@@ -25,8 +27,6 @@
     "sending": "Sending...",
     "submit": "Sign in",
     "submitting": "Signing in...",
-    "orContinueWith": "Or continue with",
-    "google": "Google",
     "noAccount": "Don't have an account?",
     "signUpLink": "Sign up"
   },
@@ -43,8 +43,6 @@
     "confirmPasswordPlaceholder": "Confirm your password",
     "submit": "Create account",
     "submitting": "Creating account...",
-    "orContinueWith": "Or continue with",
-    "google": "Google",
     "haveAccount": "Already have an account?",
     "signInLink": "Sign in",
     "verifyEmailTitle": "Verify your email",
@@ -112,7 +110,9 @@
   "Errors": {
     "invalidCredentials": "Invalid email or password",
     "signUpFailed": "Failed to create account",
-    "invalidResetToken": "Invalid or expired reset token"
+    "invalidResetToken": "Invalid or expired reset token",
+    "emailAlreadyRegistered": "An account with this email already exists",
+    "generic": "Something went wrong. Please try again."
   },
   "Emails": {
     "resetPassword": {
@@ -135,5 +135,9 @@
       "expiryNote": "This link expires in 1 hour.",
       "fallbackNote": "If the button above doesn't work, copy and paste this link into your browser:"
     }
+  },
+  "PasswordInput": {
+    "show": "Show password",
+    "hide": "Hide password"
   }
 }

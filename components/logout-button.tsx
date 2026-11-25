@@ -15,11 +15,5 @@ export default function LogoutButton() {
     router.push("/login");
   }
 
-  return (
-    <Button
-      onClick={handleSignOut}
-    >
-      {t("label")}
-    </Button>
-  );
+  return <Button onClick={handleSignOut}>{t("label")}</Button>;
 }

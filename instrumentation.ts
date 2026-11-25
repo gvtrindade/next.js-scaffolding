@@ -1,28 +1,65 @@
-import * as Sentry from "@sentry/nextjs"
+import * as Sentry from "@sentry/nextjs";
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("./sentry.server.config")
+    await import("./sentry.server.config");
   }
 }
 
-export async function onRequestError(err: any, req: any, ctx: any) {
+/** Mirrors the props Next passes to `onRequestError`. */
+interface ErrorRequest {
+  path: string;
+  method: string;
+  headers: NodeJS.Dict<string | string[]>;
+}
+
+interface ErrorRequestContext {
+  routerKind: "Pages Router" | "App Router";
+  routePath: string;
+  routeType: "render" | "route" | "action" | "proxy";
+  renderSource?: "react-server-components" | "react-server-components-payload" | "server-rendering";
+  revalidateReason?: "on-demand" | "stale";
+}
+
+function toHeaders(source: NodeJS.Dict<string | string[]>): Headers {
+  const headers = new Headers();
+
+  for (const [key, value] of Object.entries(source)) {
+    if (typeof value === "string") {
+      headers.set(key, value);
+    } else if (value) {
+      headers.set(key, value.join(", "));
+    }
+  }
+
+  return headers;
+}
+
+export async function onRequestError(
+  error: unknown,
+  request: ErrorRequest,
+  context: ErrorRequestContext,
+) {
+  // The Prisma-dependent imports stay inside this branch so the Edge
+  // instrumentation bundle never pulls in Node modules.
   if (process.env.NEXT_RUNTIME === "nodejs") {
     try {
-      const { getSessionCookie } = await import("better-auth/cookies")
-      const { prisma } = await import("@/lib/prisma")
-      const token = getSessionCookie(req)
+      const { getSessionCookie } = await import("better-auth/cookies");
+      const { findSessionUserByToken } = await import("@/services/session");
+
+      const token = getSessionCookie(toHeaders(request.headers));
       if (token) {
-        const session = await prisma.session.findUnique({
-          where: { token },
-          select: { user: { select: { id: true, email: true } } },
-        })
-        if (session?.user) Sentry.setUser({ id: session.user.id, email: session.user.email })
+        const user = await findSessionUserByToken(token);
+        if (user) {
+          Sentry.setUser({ id: user.id, email: user.email });
+        }
       }
-    } catch {}
+    } catch (sessionError) {
+      Sentry.captureException(sessionError, {
+        tags: { scope: "instrumentation", operation: "attachSessionUser" },
+      });
+    }
   }
-  Sentry.captureRequestError(err, req, ctx)
-  if (ctx.route === "/api/auth/[...all]") {
-    Sentry.captureException(err, { tags: { route: ctx.route, method: req.method } })
-  }
+
+  Sentry.captureRequestError(error, request, context);
 }

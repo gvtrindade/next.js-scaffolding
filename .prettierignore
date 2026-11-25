@@ -1,0 +1,10 @@
+# Generated or vendored code — never format by hand.
+node_modules/
+.next/
+out/
+build/
+prisma/generated/
+prisma/migrations/
+pnpm-lock.yaml
+next-env.d.ts
+*.tsbuildinfo

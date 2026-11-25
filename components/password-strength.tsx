@@ -1,36 +1,25 @@
-"use client"
+"use client";
 
-import { useTranslations } from "next-intl"
-
-interface PasswordRequirement {
-  label: string
-  met: boolean
-}
+import { useTranslations } from "next-intl";
+import { PASSWORD_RULES, metPasswordRequirements } from "@/lib/validation";
 
 interface PasswordStrengthProps {
-  value: string
+  value: string;
 }
 
+/** Strength meter driven by the shared password policy in `lib/validation.ts`. */
 export function PasswordStrength({ value }: PasswordStrengthProps) {
-  const t = useTranslations("PasswordStrength")
+  const t = useTranslations("PasswordStrength");
 
-  const requirements: PasswordRequirement[] = [
-    { label: t("minLength"), met: value.length >= 8 },
-    { label: t("lowercase"), met: /[a-z]/.test(value) },
-    { label: t("uppercase"), met: /[A-Z]/.test(value) },
-    { label: t("number"), met: /\d/.test(value) },
-    { label: t("symbol"), met: /[^a-zA-Z0-9]/.test(value) },
-  ]
-
-  const strength = requirements.filter((r) => r.met).length
-  const percentage = (strength / requirements.length) * 100
+  const metRequirements = metPasswordRequirements(value);
+  const percentage = (metRequirements / PASSWORD_RULES.length) * 100;
 
   const barColor =
-    strength <= 1
+    metRequirements <= 1
       ? "bg-destructive"
-      : strength <= 3
+      : metRequirements <= 3
         ? "bg-yellow-500"
-        : "bg-emerald-500"
+        : "bg-emerald-500";
 
   return (
     <div className="space-y-2">
@@ -41,16 +30,20 @@ export function PasswordStrength({ value }: PasswordStrengthProps) {
         />
       </div>
       <ul className="space-y-0.5">
-        {requirements.map((req) => (
-          <li
-            key={req.label}
-            className={`text-xs ${req.met ? "text-emerald-500" : "text-muted-foreground"}`}
-          >
-            {req.met ? "✓ " : "✗ "}
-            {req.label}
-          </li>
-        ))}
+        {PASSWORD_RULES.map((rule) => {
+          const met = rule.test(value);
+
+          return (
+            <li
+              key={rule.labelKey}
+              className={`text-xs ${met ? "text-emerald-500" : "text-muted-foreground"}`}
+            >
+              {met ? "✓ " : "✗ "}
+              {t(rule.labelKey)}
+            </li>
+          );
+        })}
       </ul>
     </div>
-  )
+  );
 }

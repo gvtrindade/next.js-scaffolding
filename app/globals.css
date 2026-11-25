@@ -4,17 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline{
-  --color-hull: #1A1614;
-  --color-panel: #2D2824;
-  --color-panel2: #36312D;
-  --color-cream: #F5F2E8;
-  --color-sand: #A09687;
-  --color-green: #78A890;
-  --color-amber: #D98C45;
-  --color-red: #A64444;
-  --color-blue: #5B8A9E;
-  --color-border-custom: #3E3830;
+@theme inline {
+  --color-hull: #1a1614;
+  --color-panel: #2d2824;
+  --color-panel2: #36312d;
+  --color-cream: #f5f2e8;
+  --color-sand: #a09687;
+  --color-green: #78a890;
+  --color-amber: #d98c45;
+  --color-red: #a64444;
+  --color-blue: #5b8a9e;
+  --color-border-custom: #3e3830;
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-jetbrains);
